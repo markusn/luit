@@ -1,4 +1,4 @@
-/* $XFree86$ */
+/* $XFree86: xc/programs/luit/sys.h,v 1.3 2003/10/24 20:38:12 tsi Exp $ */
 /*
 Copyright (c) 2001 by Juliusz Chroboczek
 
