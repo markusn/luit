@@ -1,4 +1,4 @@
-.\" $XFree86: xc/programs/luit/luit.man,v 1.8 2003/04/03 16:44:36 dawes Exp $
+.\" $XFree86: xc/programs/luit/luit.man,v 1.7 2003/02/24 01:10:25 dawes Exp $
 .TH LUIT 1 __vendorversion__
 .SH NAME
 luit \- Locale and ISO\ 2022 support for Unicode terminals
