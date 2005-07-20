@@ -21,8 +21,8 @@
 
 bin_PROGRAMS = luit
 
-luit_CFLAGS = $(DEP_CFLAGS)
-luit_LDADD = $(DEP_LIBS)
+luit_CFLAGS = $(LUIT_CFLAGS)
+luit_LDADD = $(LUIT_LIBS)
 
 luit_SOURCES =	\
         charset.c \

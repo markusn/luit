@@ -34,8 +34,8 @@ AC_PROG_INSTALL
 AC_CHECK_LIB(z, gzopen,, AC_MSG_ERROR([zlib not found]))
 
 # Checks for pkg-config packages
-PKG_CHECK_MODULES(DEP, x11 fontenc)
-AC_SUBST(DEP_CFLAGS)
-AC_SUBST(DEP_LIBS)
+PKG_CHECK_MODULES(LUIT, x11 fontenc)
+AC_SUBST(LUIT_CFLAGS)
+AC_SUBST(LUIT_LIBS)
 
 AC_OUTPUT([Makefile])
