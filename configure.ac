@@ -22,7 +22,7 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ([2.57])
-AC_INIT(luit,[7.0], [xorg@freedesktop.org],luit)
+AC_INIT(luit,[0.99.0], [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],luit)
 AM_INIT_AUTOMAKE([dist-bzip2])
 AM_MAINTAINER_MODE
 
@@ -37,5 +37,7 @@ AC_CHECK_LIB(z, gzopen,, AC_MSG_ERROR([zlib not found]))
 PKG_CHECK_MODULES(LUIT, x11 fontenc)
 AC_SUBST(LUIT_CFLAGS)
 AC_SUBST(LUIT_LIBS)
+
+XORG_RELEASE_VERSION
 
 AC_OUTPUT([Makefile])
