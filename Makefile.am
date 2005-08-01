@@ -39,6 +39,6 @@ luit_SOURCES =	\
         sys.c \
         sys.h
 
-dist_man_MANS = \
+dist_man1_MANS = \
         luit.man
 
