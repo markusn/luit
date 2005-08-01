@@ -30,11 +30,23 @@ AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_CANONICAL_HOST
 
 AC_CHECK_LIB(z, gzopen,, AC_MSG_ERROR([zlib not found]))
 
 # Checks for pkg-config packages
 PKG_CHECK_MODULES(LUIT, x11 fontenc)
+
+case $host_os in
+    linux*)
+        OS_CFLAGS="-D_XOPEN_SOURCE"
+        ;;
+    *)
+        OS_CFLAGS=
+        ;;
+esac
+
+LUIT_CFLAGS="$LUIT_CFLAGS $OS_CFLAGS"
 AC_SUBST(LUIT_CFLAGS)
 AC_SUBST(LUIT_LIBS)
 
