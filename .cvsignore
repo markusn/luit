@@ -4,6 +4,7 @@ Makefile.in
 aclocal.m4
 autom4te.cache
 compile
+config.guess
 config.h
 config.h.in
 config.log
@@ -13,5 +14,6 @@ configure
 depcomp
 install-sh
 luit
+luit.1
 missing
 stamp-h1
