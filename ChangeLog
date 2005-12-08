@@ -1,3 +1,9 @@
+2005-12-08  Kevin E. Martin  <kem-at-freedesktop-dot-org>
+
+	* Makefile.am:
+	* configure.ac:
+	Add configure options to allow hard-coded paths to be changed.
+
 2005-12-06  Kevin E. Martin  <kem-at-freedesktop-dot-org>
 
 	* Makefile.am:
