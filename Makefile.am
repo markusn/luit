@@ -49,10 +49,19 @@ appmandir = $(APP_MAN_DIR)
 
 appman_DATA = $(appman_PRE:man=@APP_MAN_SUFFIX@)
 
-EXTRA_DIST = $(appman_PRE)
+EXTRA_DIST = $(appman_PRE) ChangeLog
 CLEANFILES = $(appman_DATA)
 
 SED = sed
+
+MAINTAINERCLEANFILES = ChangeLog
+
+.PHONY: Changelog
+
+ChangeLog:
+	GIT_DIR=${srcdir}/.git git-log > ChangeLog
+
+dist-hook: ChangeLog
 
 # Strings to replace in man pages
 XORGRELSTRING = @PACKAGE_STRING@
