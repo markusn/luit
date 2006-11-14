@@ -56,8 +56,6 @@ SED = sed
 
 MAINTAINERCLEANFILES = ChangeLog
 
-.PHONY: Changelog
-
 ChangeLog:
 	GIT_DIR=${srcdir}/.git git-log > ChangeLog
 
