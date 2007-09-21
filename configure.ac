@@ -36,9 +36,9 @@ AC_CHECK_LIB(z, gzopen,, AC_MSG_ERROR([zlib not found]))
 
 AC_ARG_WITH(localealiasfile,
         AC_HELP_STRING([--with-localealiasfile=<path>],
-                       [The locale alias file (default: ${libdir}/X11/locale/locale.alias)]),
+                       [The locale alias file (default: ${datadir}/X11/locale/locale.alias)]),
         [LOCALEALIASFILE="$withval"],
-        [LOCALEALIASFILE=${libdir}/X11/locale/locale.alias])
+        [LOCALEALIASFILE=${datadir}/X11/locale/locale.alias])
 AC_SUBST([LOCALEALIASFILE])
 
 # Checks for pkg-config packages
