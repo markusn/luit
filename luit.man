@@ -219,6 +219,6 @@ xterm(1), unicode(7), utf-8(7), charsets(7).
 .SH AUTHOR
 The version of
 .B Luit
-included in this X.org Foundataion release
+included in this X.org Foundation release
 was originally written by Juliusz Chroboczek <jch@freedesktop.org>
 for the XFree86 Project.
