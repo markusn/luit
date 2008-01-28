@@ -430,7 +430,7 @@ LocaleCharsetRec localeCharsets[] = {
 };
 
 void
-reportCharsets()
+reportCharsets(void)
 {
     LocaleCharsetPtr p;
     FontencCharsetPtr q;

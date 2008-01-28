@@ -455,7 +455,7 @@ openTty(char *line)
    saved IDs at all, so there's no issue. */
 #if (defined(BSD) && !defined(_POSIX_SAVED_IDS)) || defined(_MINIX)
 int
-droppriv()
+droppriv(void)
 {
     int rc;
     rc = setuid(getuid());
@@ -465,7 +465,7 @@ droppriv()
 }
 #elif defined(_POSIX_SAVED_IDS)
 int
-droppriv()
+droppriv(void)
 {
     int uid = getuid();
     int euid = geteuid();
@@ -484,7 +484,7 @@ droppriv()
 }
 #else
 int
-droppriv()
+droppriv(void)
 {
     int uid = getuid();
     int euid = geteuid();
