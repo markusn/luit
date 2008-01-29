@@ -72,6 +72,7 @@ MAN_SUBSTS = \
 	-e 's|__xorgversion__|"$(XORGRELSTRING)" "$(XORGMANNAME)"|' \
 	-e 's|__xservername__|Xorg|g' \
 	-e 's|__xconfigfile__|xorg.conf|g' \
+	-e 's|__localealiasfile__|$(LOCALEALIASFILE)|g' \
 	-e 's|__projectroot__|$(prefix)|g' \
 	-e 's|__apploaddir__|$(appdefaultdir)|' \
 	-e 's|__appmansuffix__|$(APP_MAN_SUFFIX)|g' \

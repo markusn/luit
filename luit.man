@@ -180,7 +180,7 @@ M-x set-terminal-coding-system RET iso-2022-8bit-ss2 RET
 .B __projectroot__/lib/X11/fonts/encodings/encodings.dir
 The system-wide encodings directory.
 .TP
-.B __projectroot__/lib/X11/locale/locale.alias
+.B __localealiasfile__
 The file mapping locales to locale encodings.
 .SH SECURITY
 On systems with SVR4 (``Unix-98'') ptys (Linux version 2.2 and later,
