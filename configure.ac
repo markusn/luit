@@ -46,7 +46,7 @@ PKG_CHECK_MODULES(LUIT, x11 fontenc)
 
 case $host_os in
     linux*)
-        OS_CFLAGS="-D_XOPEN_SOURCE"
+        OS_CFLAGS="-D_XOPEN_SOURCE=500"
         ;;
     *)
         OS_CFLAGS=
