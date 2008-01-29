@@ -164,7 +164,7 @@ OtherCharsetRec otherCharsets[] = {
 };
 
 static int
-compare(char *s, char *t)
+compare(const char *s, const char *t)
 {
     while(*s || *t) {
         if(*s && (isspace(*s) || *s == '-' || *s == '_'))
@@ -229,7 +229,7 @@ FontencCharsetReverse(unsigned int i, CharsetPtr self)
 static CharsetPtr cachedCharsets = NULL;
 
 static CharsetPtr 
-getCachedCharset(unsigned char final, int type, char *name)
+getCachedCharset(unsigned char final, int type, const char *name)
 {
     CharsetPtr c;
     for(c = cachedCharsets; c; c = c->next) {
@@ -248,7 +248,7 @@ cacheCharset(CharsetPtr c) {
 }
 
 static CharsetPtr
-getFontencCharset(unsigned char final, int type, char *name)
+getFontencCharset(unsigned char final, int type, const char *name)
 {
     FontencCharsetPtr fc;
     CharsetPtr c;
@@ -298,7 +298,7 @@ getFontencCharset(unsigned char final, int type, char *name)
 }
 
 static CharsetPtr
-getOtherCharset(char *name)
+getOtherCharset(const char *name)
 {
     OtherCharsetPtr fc;
     CharsetPtr c;
@@ -371,7 +371,7 @@ getCharset(unsigned char final, int type)
 }
 
 CharsetPtr 
-getCharsetByName(char *name)
+getCharsetByName(const char *name)
 {
     CharsetPtr c;
 
@@ -393,7 +393,7 @@ getCharsetByName(char *name)
     return getUnknownCharset(T_94);
 }
 
-LocaleCharsetRec localeCharsets[] = {
+const LocaleCharsetRec localeCharsets[] = {
     { "C", 0, 2, "ASCII", NULL, "ISO 8859-1", NULL, NULL},
     { "POSIX", 0, 2, "ASCII", NULL, "ISO 8859-1", NULL, NULL},
     { "ISO8859-1", 0, 2, "ASCII", NULL, "ISO 8859-1", NULL, NULL},
@@ -432,7 +432,7 @@ LocaleCharsetRec localeCharsets[] = {
 void
 reportCharsets(void)
 {
-    LocaleCharsetPtr p;
+    const LocaleCharsetRec *p;
     FontencCharsetPtr q;
     printf("Known locale encodings:\n\n");
     for(p = localeCharsets; p->name; p++) {
@@ -455,14 +455,14 @@ reportCharsets(void)
 }
 
 int
-getLocaleState(char *locale, char *charset,
+getLocaleState(const char *locale, char *charset,
                int *gl_return, int *gr_return,
                CharsetPtr *g0_return, CharsetPtr *g1_return,
                CharsetPtr *g2_return, CharsetPtr *g3_return,
                CharsetPtr *other_return)
 {
     char *resolved = NULL;
-    LocaleCharsetPtr p;
+    const LocaleCharsetRec *p;
 
     if(!charset) {
         resolved = resolveLocale(locale);

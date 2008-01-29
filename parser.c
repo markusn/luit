@@ -167,7 +167,7 @@ parseTwoTokenLine(FILE *f, char *first, char *second)
 }
 
 char *
-resolveLocale(char *locale)
+resolveLocale(const char *locale)
 {
     FILE *f;
     char first[MAX_KEYWORD_LENGTH], second[MAX_KEYWORD_LENGTH];
