@@ -56,7 +56,7 @@ THE SOFTWARE.
 
 #if (defined(__GLIBC__) && \
      (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1))) || \
-    defined(SVR4)
+    defined(SVR4) || defined(__APPLE__)
 #define HAVE_GRANTPT
 #endif
 
@@ -340,7 +340,12 @@ allocatePty(int *pty_return, char **line_return)
     char *temp_line;
     int rc;
 
+#ifdef __APPLE__
+    pty = posix_openpt(O_RDWR);
+#else
     pty = open("/dev/ptmx", O_RDWR);
+#endif
+
     if(pty < 0)
         goto bsd;
 
