@@ -34,8 +34,12 @@ THE SOFTWARE.
 #include <sys/ioctl.h>
 #include <signal.h>
 
-#ifdef SVR4
-#include <stropts.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#ifdef HAVE_STROPTS_H
+# include <stropts.h>
 #endif
 
 #include <X11/fonts/fontenc.h>

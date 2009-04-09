@@ -38,6 +38,9 @@ AC_CANONICAL_HOST
 
 XORG_CWARNFLAGS
 
+AC_CHECK_HEADERS([poll.h pty.h stropts.h sys/param.h sys/select.h])
+AC_CHECK_FUNCS([poll select grantpt])
+
 AC_CHECK_LIB(z, gzopen,, AC_MSG_ERROR([zlib not found]))
 
 AC_ARG_WITH(localealiasfile,
