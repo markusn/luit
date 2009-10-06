@@ -408,8 +408,18 @@ openTty(char *line)
     int rc;
     int tty = -1;
 
+#if !defined(O_NOCTTY) || !defined(TIOCSCTTY)
+    /* e.g. Cygwin has a working O_NOCTTY but no TIOCSCTTY, so the tty
+       must be opened as controlling */
+    tty = open(line, O_RDWR);
+#else
+    /* The TIOCSCTTY ioctl below will fail if the process already has a
+       controlling tty (even if the current controlling tty is the same
+       as the tty you want to make controlling).  So we need to open
+       the tty with O_NOCTTY to make sure this doesn't happen. */
     tty = open(line, O_RDWR | O_NOCTTY);
- 
+#endif
+
     if(tty < 0)
         goto bail;
 
