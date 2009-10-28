@@ -56,12 +56,15 @@ CLEANFILES = $(appman_DATA)
 SED = sed
 
 
-.PHONY: ChangeLog
+.PHONY: ChangeLog INSTALL
+
+INSTALL:
+	$(INSTALL_CMD)
 
 ChangeLog:
 	$(CHANGELOG_CMD)
 
-dist-hook: ChangeLog
+dist-hook: ChangeLog INSTALL
 
 # Strings to replace in man pages
 XORGRELSTRING = @PACKAGE_STRING@
