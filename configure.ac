@@ -39,8 +39,8 @@ AC_PROG_INSTALL
 AC_CANONICAL_HOST
 
 
-AC_CHECK_HEADERS([poll.h pty.h stropts.h sys/param.h sys/select.h])
-AC_CHECK_FUNCS([poll select grantpt])
+AC_CHECK_HEADERS([pty.h stropts.h sys/param.h sys/select.h])
+AC_CHECK_FUNCS([select grantpt])
 
 AC_CHECK_LIB(z, gzopen,, AC_MSG_ERROR([zlib not found]))
 
@@ -55,10 +55,19 @@ AC_SUBST([LOCALEALIASFILE])
 PKG_CHECK_MODULES(LUIT, x11 fontenc)
 
 case $host_os in
+    # darwin has poll() but can't be used to poll character devices (atleast
+ through SnowLeopard)
+    darwin*)
+        OS_CFLAGS=
+        ;;
     linux*)
+        AC_CHECK_HEADERS([poll.h])
+        AC_CHECK_FUNCS([poll])
         OS_CFLAGS="-D_XOPEN_SOURCE=500"
         ;;
     *)
+        AC_CHECK_HEADERS([poll.h])
+        AC_CHECK_FUNCS([poll])
         OS_CFLAGS=
         ;;
 esac
