@@ -55,8 +55,7 @@ AC_SUBST([LOCALEALIASFILE])
 PKG_CHECK_MODULES(LUIT, x11 fontenc)
 
 case $host_os in
-    # darwin has poll() but can't be used to poll character devices (atleast
- through SnowLeopard)
+    # darwin has poll() but can't be used to poll character devices (atleast through SnowLeopard)
     darwin*)
         OS_CFLAGS=
         ;;
