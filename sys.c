@@ -102,9 +102,9 @@ waitForInput(int fd1, int fd2)
         return -1;
 
     ret = 0;
-    if(pfd[0].revents & POLLIN)
+    if(pfd[0].revents & (POLLIN | POLLERR | POLLHUP))
         ret |= 1;
-    if(pfd[1].revents & POLLIN)
+    if(pfd[1].revents & (POLLIN | POLLERR | POLLHUP))
         ret |= 2;
     return ret;
 }
