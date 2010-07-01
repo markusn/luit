@@ -51,7 +51,11 @@ AC_ARG_WITH(localealiasfile,
 AC_SUBST([LOCALEALIASFILE])
 
 # Checks for pkg-config packages
-PKG_CHECK_MODULES(LUIT, x11 fontenc)
+PKG_CHECK_MODULES(LUIT, fontenc)
+
+# We don't link against libX11, just use its locale.alias data file
+PKG_CHECK_EXISTS(x11, [],
+	[AC_MSG_WARN([libX11 not found.  luit may not be able to find locale aliases without it.])])
 
 case $host_os in
     # darwin has poll() but can't be used to poll character devices (atleast through SnowLeopard)
