@@ -19,13 +19,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-/* $XFree86$ */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "luit.h"
 #include "parser.h"
+#include "sys.h"
 
 static char keyword[MAX_KEYWORD_LENGTH];
 
@@ -76,7 +81,7 @@ getString(FILE *f, int string_end, int *c_return)
             if(c == '\n')
                 continue;
         }
-        keyword[i++] = c;
+	keyword[i++] = (char) c;
         if(i >= MAX_KEYWORD_LENGTH)
             return TOK_ERROR;
         c = getc(f);
@@ -117,7 +122,7 @@ getToken(FILE *f, int c, int parse_assignments, int *c_return)
             if(c == '\n')
                 continue;
         }
-        keyword[i++] = c;
+	keyword[i++] = (char) c;
         if(i >= MAX_KEYWORD_LENGTH)
             return TOK_ERROR;
         c = getc(f);
@@ -129,7 +134,6 @@ getToken(FILE *f, int c, int parse_assignments, int *c_return)
     keyword[i] = '\0';
     return TOK_KEYWORD;
 }
-
 
 /* Can parse both the old and new formats for locale.alias */
 static int
@@ -146,7 +150,7 @@ parseTwoTokenLine(FILE *f, char *first, char *second)
     else if(tok == TOK_EOL)
         goto again;
     else if(tok == TOK_KEYWORD) {
-        int len = strlen(keyword);
+	size_t len = strlen(keyword);
         if(keyword[len - 1] == ':')
             keyword[len - 1] = '\0';
         strcpy(first, keyword);
@@ -173,37 +177,32 @@ resolveLocale(const char *locale)
     char first[MAX_KEYWORD_LENGTH], second[MAX_KEYWORD_LENGTH];
     char *resolved = NULL;
     int rc;
+    int found = 0;
 
-    f = fopen(LOCALE_ALIAS_FILE, "r");
-    if(f == NULL)
-        goto bail;
+    f = fopen(locale_alias, "r");
 
+    if (f != NULL) {
     do {
         rc = parseTwoTokenLine(f, first, second);
         if(rc < -1)
-            goto bail;
+		break;
         if(!strcmp(first, locale)) {
-            resolved = strdup(second);
-            if(resolved == NULL)
-                goto bail;
+		resolved = strmalloc(second);
+		found = 1;
             break;
         }
     } while(rc >= 0);
 
+	if (!found) {
     if(resolved == NULL) {
-        resolved = strdup(locale);
-        if(resolved == NULL)
-            goto bail;
+		resolved = strmalloc(locale);
+	    }
     }
 
     fclose(f);
+    } else {
+	perror(locale_alias);
+    }
 
     return resolved;
-
-  bail:
-    if(f != NULL)
-        fclose(f);
-    if(resolved != NULL)
-        free(resolved);
-    return NULL;
 }

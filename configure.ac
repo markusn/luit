@@ -1,4 +1,3 @@
-
 dnl  Copyright 2005 Red Hat, Inc.
 dnl 
 dnl  Permission to use, copy, modify, distribute, and sell this software and its
@@ -70,6 +69,25 @@ case $host_os in
         OS_CFLAGS=
         ;;
 esac
+
+AC_CHECK_HEADERS([pty.h stropts.h sys/ioctl.h sys/param.h sys/poll.h sys/select.h sys/time.h termios.h]) 
+AC_CHECK_FUNCS([grantpt putenv select strdup])
+
+if test "x$ac_cv_func_grantpt" != "xyes" ; then
+        AC_CHECK_LIB(util, openpty, [cf_have_openpty=yes],[cf_have_openpty=no])
+        if test "$cf_have_openpty" = yes ; then
+                LIBS="-lutil $LIBS"
+                AC_DEFINE(HAVE_OPENPTY, 1, [Have openpty in libutil])
+                AC_CHECK_HEADERS( \
+                        util.h \
+                        libutil.h \
+                        pty.h \
+                )
+        fi
+fi
+
+CF_FUNC_POLL
+CF_SIGWINCH
 
 LUIT_CFLAGS="$LUIT_CFLAGS $OS_CFLAGS"
 AC_SUBST(LUIT_CFLAGS)

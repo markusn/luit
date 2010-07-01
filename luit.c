@@ -19,7 +19,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-/* $XFree86: xc/programs/luit/luit.c,v 1.9 2002/10/17 01:06:09 dawes Exp $ */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,30 +37,28 @@ THE SOFTWARE.
 #include <sys/ioctl.h>
 #include <signal.h>
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#ifdef HAVE_STROPTS_H
-# include <stropts.h>
-#endif
-
-#include <X11/fonts/fontenc.h>
 #include "luit.h"
 #include "sys.h"
 #include "other.h"
-#include "charset.h"
+#include "parser.h"
 #include "iso2022.h"
+
+static int pipe_option = 0;
+static int p2c_waitpipe[2];
+static int c2p_waitpipe[2];
 
 static Iso2022Ptr inputState = NULL, outputState = NULL;
 
 static char *child_argv0 = NULL;
-static char *locale_name = NULL;
+static const char *locale_name = NULL;
+static int exitOnChild = 0;
+static int converter = 0;
+
+const char *locale_alias = LOCALE_ALIAS_FILE;
+
 int ilog = -1;
 int olog = -1;
 int verbose = 0;
-static int converter = 0;
-static int exitOnChild = 0;
 
 static volatile int sigwinch_queued = 0;
 static volatile int sigchld_queued = 0;
@@ -66,7 +67,7 @@ static int convert(int, int);
 static int condom(int, char**);
 
 static void
-ErrorF(char *f, ...)
+ErrorF(const char *f,...)
 {
     va_list args;
     va_start(args, f);
@@ -75,22 +76,21 @@ ErrorF(char *f, ...)
 }
 
 static void
-FatalError(char *f, ...)
+FatalError(const char *f,...)
 {
     va_list args;
     va_start(args, f);
     vfprintf(stderr, f, args);
     va_end(args);
-    exit(1);
+    ExitProgram(1);
 }
-
 
 static void
 help(void)
 {
     fprintf(stderr, 
             "luit\n"
-            "  [ -h ] [ -list ] [ -v ] [ -argv0 name ]\n"
+	    "  [ -V ] [ -h ] [ -list ] [ -v ] [ -argv0 name ]\n"
             "  [ -gl gn ] [-gr gk] "
             "[ -g0 set ] [ -g1 set ] "
             "[ -g2 set ] [ -g3 set ]\n"
@@ -100,12 +100,16 @@ help(void)
             "[ -kg0 set ] [ -kg1 set ] "
             "[ -kg2 set ] [ -kg3 set ]\n"
             "  [ -k7 ] [ +kss ] [ +kssgr ] [ -kls ]\n"
-            "  [ -c ] [ -x ] [ -ilog filename ] [ -olog filename ] [ -- ]\n"
+	    "  [ -c ] "
+	    "[ -p ] "
+	    "[ -x ] "
+	    "[ -ilog filename ] "
+	    "[ -olog filename ] "
+	    "[ -alias filename ] "
+	    "[ -- ]\n"
             "  [ program [ args ] ]\n");
-
 }
             
-
 static int
 parseOptions(int argc, char **argv)
 {
@@ -119,12 +123,15 @@ parseOptions(int argc, char **argv)
         } else if(!strcmp(argv[i], "-v")) {
             verbose++;
             i++;
+	} else if (!strcmp(argv[i], "-V")) {
+	    printf("%s - %s\n", argv[0], VERSION);
+	    ExitProgram(0);
         } else if(!strcmp(argv[i], "-h")) {
             help();
-            exit(0);
+	    ExitProgram(0);
         } else if(!strcmp(argv[i], "-list")) {
             reportCharsets();
-            exit(0);
+	    ExitProgram(0);
         } else if(!strcmp(argv[i], "+oss")) {
             outputState->outputFlags &= ~OF_SS;
             i++;
@@ -272,7 +279,7 @@ parseOptions(int argc, char **argv)
             ilog = open(argv[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
             if(ilog < 0) {
                 perror("Couldn't open input log");
-                exit(1);
+		ExitProgram(1);
             }
             i += 2;
         } else if(!strcmp(argv[i], "-olog")) {
@@ -281,17 +288,22 @@ parseOptions(int argc, char **argv)
             olog = open(argv[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
             if(olog < 0) {
                 perror("Couldn't open output log");
-                exit(1);
+		ExitProgram(1);
             }
             i += 2;
+	} else if (!strcmp(argv[i], "-alias")) {
+	    if (i + 1 >= argc)
+		FatalError("-alias requires an argument\n");
+	    locale_alias = argv[i + 1];
+	    i += 2;
         } else if(!strcmp(argv[i], "-encoding")) {
-            int rc;
             if(i + 1 >= argc)
                 FatalError("-encoding requires an argument\n");
-            rc = initIso2022(NULL, argv[i + 1], outputState);
-            if(rc < 0)
-                FatalError("Couldn't init output state\n");
+	    locale_name = argv[i + 1];
             i += 2;
+	} else if (!strcmp(argv[i], "-p")) {
+	    pipe_option = 1;
+	    i += 1;
         } else {
             FatalError("Unknown option %s\n", argv[i]);
         }
@@ -300,8 +312,10 @@ parseOptions(int argc, char **argv)
 }
 
 static int
-parseArgs(int argc, char **argv, char *argv0,
-          char **path_return, char ***argv_return)
+parseArgs(int argc, char **argv,
+	  char *argv0,
+	  char **path_return,
+	  char ***argv_return)
 {
     char *path = NULL;
     char **child_argv = NULL;
@@ -310,12 +324,14 @@ parseArgs(int argc, char **argv, char *argv0,
         char *shell;
         shell = getenv("SHELL");
         if(shell) {
-            path = strdup(shell);
+	    path = strmalloc(shell);
+	    if (!path)
+		goto bail;
         } else {
-            path = strdup("/bin/sh");
-        }
+	    path = strmalloc("/bin/sh");
         if(!path)
             goto bail;
+	}
         child_argv = malloc(2 * sizeof(char*));
         if(!child_argv)
             goto bail;
@@ -325,10 +341,10 @@ parseArgs(int argc, char **argv, char *argv0,
             child_argv[0] = my_basename(path);
         child_argv[1] = NULL;
     } else {
-        path = strdup(argv[0]);
+	path = strmalloc(argv[0]);
         if(!path)
             goto bail;
-        child_argv = malloc((argc + 1) * sizeof(char*));
+	child_argv = malloc((unsigned) (argc + 1) * sizeof(char *));
         if(!child_argv) {
             goto bail;
         }
@@ -336,7 +352,7 @@ parseArgs(int argc, char **argv, char *argv0,
             child_argv[0] = argv0;
         else
             child_argv[0] = my_basename(argv[0]);
-        memcpy(child_argv + 1, argv + 1, (argc - 1) * sizeof(char*));
+	memcpy(child_argv + 1, argv + 1, (unsigned) (argc - 1) * sizeof(char *));
         child_argv[argc] = NULL;
     }
 
@@ -352,13 +368,17 @@ parseArgs(int argc, char **argv, char *argv0,
     return -1;
 }
         
-
 int
 main(int argc, char **argv)
 {
     int rc;
     int i;
     char *l;
+
+#ifdef HAVE_PUTENV
+    if ((l = strmalloc("NCURSES_NO_UTF8_ACS=1")) != 0)
+	putenv(l);
+#endif
 
     l = setlocale(LC_ALL, "");
     if(!l)
@@ -389,22 +409,27 @@ main(int argc, char **argv)
         locale_name = "C";
     }
 
-    rc = initIso2022(locale_name, NULL, outputState);
-    if(rc < 0)
-        FatalError("Couldn't init output state\n");
-
     i = parseOptions(argc, argv);
     if(i < 0)
         FatalError("Couldn't parse options\n");
+
+    rc = initIso2022(locale_name, NULL, outputState);
+    if (rc < 0)
+	FatalError("Couldn't init output state\n");
 
     rc = mergeIso2022(inputState, outputState);
     if(rc < 0)
         FatalError("Couldn't init input state\n");
 
     if(converter)
-        return convert(0, 1);
+	rc = convert(0, 1);
     else
-        return condom(argc - i, argv + i);
+	rc = condom(argc - i, argv + i);
+
+#ifdef NO_LEAKS
+    ExitProgram(rc);
+#endif
+    return rc;
 }
 
 static int
@@ -415,65 +440,44 @@ convert(int ifd, int ofd)
 
     rc = droppriv();
     if(rc < 0) {
-        perror("Couldn't drop priviledges");
-        exit(1);
+	perror("Couldn't drop privileges");
+	ExitProgram(1);
     }
 
     while(1) {
-        i = read(ifd, buf, BUFFER_SIZE);
+	i = (int) read(ifd, buf, (size_t) BUFFER_SIZE);
         if(i <= 0) {
             if(i < 0) {
                 perror("Read error");
-                exit(1);
+		ExitProgram(1);
             }
             break;
         }
-        copyOut(outputState, ofd, buf, i);
+	copyOut(outputState, ofd, buf, (unsigned) i);
     }
     return 0;
 }
         
+#ifdef SIGWINCH
 static void
-sigwinchHandler(int sig)
+sigwinchHandler(int sig GCC_UNUSED)
 {
     sigwinch_queued = 1;
 }
+#endif
 
 static void
-sigchldHandler(int sig)
+sigchldHandler(int sig GCC_UNUSED)
 {
     sigchld_queued = 1;
 }
 
 static int
-condom(int argc, char **argv)
+setup_io(int pty)
 {
-    int pty;
-    int pid;
-    char *line;
-    char *path;
-    char **child_argv;
     int rc;
     int val;
 
-    path = NULL;
-    child_argv = NULL;
-    rc = parseArgs(argc, argv, child_argv0,
-                   &path, &child_argv);
-    if(rc < 0)
-        FatalError("Couldn't parse arguments\n");
-
-    rc = allocatePty(&pty, &line);
-    if(rc < 0) {
-        perror("Couldn't allocate pty");
-        exit(1);
-    }
-
-    rc = droppriv();
-    if(rc < 0) {
-        perror("Couldn't drop priviledges");
-        exit(1);
-    }
 #ifdef SIGWINCH
     installHandler(SIGWINCH, sigwinchHandler);
 #endif
@@ -498,20 +502,97 @@ condom(int argc, char **argv)
 
     setWindowSize(0, pty);
 
+    return rc;
+}
+
+static void
+cleanup_io(int pty)
+{
+    int val;
+
+#ifdef SIGWINCH
+    installHandler(SIGWINCH, SIG_DFL);
+#endif
+    installHandler(SIGCHLD, SIG_DFL);
+
+    val = fcntl(0, F_GETFL, 0);
+    if (val >= 0) {
+	fcntl(0, F_SETFL, val & ~O_NONBLOCK);
+    }
+    val = fcntl(pty, F_GETFL, 0);
+    if (val >= 0) {
+	fcntl(pty, F_SETFL, val & ~O_NONBLOCK);
+    }
+}
+
+static void
+close_waitpipe(int which)
+{
+    close(p2c_waitpipe[which]);
+    close(c2p_waitpipe[!which]);
+}
+
+static void
+write_waitpipe(int fds[2])
+{
+    IGNORE_RC(write(fds[1], "1", (size_t) 1));
+}
+
+static void
+read_waitpipe(int fds[2])
+{
+    char tmp[10];
+    IGNORE_RC(read(fds[0], tmp, (size_t) 1));
+}
+
+static int
+condom(int argc, char **argv)
+{
+    int pty;
+    int pid;
+    char *line;
+    char *path = 0;
+    char **child_argv = 0;
+    int rc;
+
+    rc = parseArgs(argc, argv, child_argv0,
+		   &path, &child_argv);
+    if (rc < 0)
+	FatalError("Couldn't parse arguments\n");
+
+    rc = allocatePty(&pty, &line);
+    if (rc < 0) {
+	perror("Couldn't allocate pty");
+	ExitProgram(1);
+    }
+
+    rc = droppriv();
+    if (rc < 0) {
+	perror("Couldn't drop privileges");
+	ExitProgram(1);
+    }
+
+    if (pipe_option) {
+	IGNORE_RC(pipe(p2c_waitpipe));
+	IGNORE_RC(pipe(c2p_waitpipe));
+    }
+
     pid = fork();
     if(pid < 0) {
         perror("Couldn't fork");
-        exit(1);
+	ExitProgram(1);
     }
 
     if(pid == 0) {
         close(pty);
-#ifdef SIGWINCH
-        installHandler(SIGWINCH, SIG_DFL);
-#endif
-        installHandler(SIGCHLD, SIG_DFL);
+	if (pipe_option) {
+	    close_waitpipe(1);
+	}
         child(line, path, child_argv);
     } else {
+	if (pipe_option) {
+	    close_waitpipe(0);
+	}
         free(child_argv);
         free(path);
         free(line);
@@ -522,7 +603,7 @@ condom(int argc, char **argv)
 }
 
 void
-child(char *line, char *path, char **argv)
+child(char *line, char *path, char *const argv[])
 {
     int tty;
     int pgrp;
@@ -534,13 +615,16 @@ child(char *line, char *path, char **argv)
     pgrp = setsid();
     if(pgrp < 0) {
         kill(getppid(), SIGABRT);
-        exit(1);
+	ExitProgram(1);
     }
 
     tty = openTty(line);
     if(tty < 0) {
         kill(getppid(), SIGABRT);
-        exit(1);
+	ExitProgram(1);
+    }
+    if (pipe_option) {
+	write_waitpipe(c2p_waitpipe);
     }
     
     if(tty != 0)
@@ -553,20 +637,35 @@ child(char *line, char *path, char **argv)
     if(tty > 2)
         close(tty);
     
+    if (pipe_option) {
+	read_waitpipe(p2c_waitpipe);
+	close_waitpipe(0);
+    }
+
     execvp(path, argv);
     perror("Couldn't exec");
-    exit(1);
+    ExitProgram(1);
 }
 
 void
-parent(int pid, int pty)
+parent(int pid GCC_UNUSED, int pty)
 {
     unsigned char buf[BUFFER_SIZE];
     int i;
     int rc;
 
+    if (pipe_option) {
+	read_waitpipe(c2p_waitpipe);
+    }
+
     if(verbose) {
         reportIso2022(outputState);
+    }
+    setup_io(pty);
+
+    if (pipe_option) {
+	write_waitpipe(p2c_waitpipe);
+	close_waitpipe(1);
     }
 
     for(;;) {
@@ -582,14 +681,14 @@ parent(int pid, int pty)
 
         if(rc > 0) {
             if(rc & 2) {
-                i = read(pty, buf, BUFFER_SIZE);
+		i = (int) read(pty, buf, (size_t) BUFFER_SIZE);
                 if((i == 0) || ((i < 0) && (errno != EAGAIN)))
                     break;
                 if(i > 0)
-                    copyOut(outputState, 0, buf, i);
+		    copyOut(outputState, 0, buf, (unsigned) i);
             }
             if(rc & 1) {
-                i = read(0, buf, BUFFER_SIZE);
+		i = (int) read(0, buf, (size_t) BUFFER_SIZE);
                 if((i == 0) || ((i < 0) && (errno != EAGAIN)))
                     break;
                 if(i > 0)
@@ -599,4 +698,14 @@ parent(int pid, int pty)
     }
 
     restoreTermios();
+    cleanup_io(pty);
 }
+
+#ifdef NO_LEAKS
+void
+luit_leaks(void)
+{
+    destroyIso2022(inputState);
+    destroyIso2022(outputState);
+}
+#endif
