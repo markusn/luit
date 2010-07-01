@@ -49,7 +49,7 @@ static int
 IdentityReverse(unsigned int n, const CharsetRec * self)
 {
 #define IS_GL(n) ((n) >= 0x20 && (n) < 0x80)
-    switch(self->type) {
+    switch (self->type) {
     case T_94:
     case T_96:
 	if (IS_GL(n))
@@ -63,17 +63,17 @@ IdentityReverse(unsigned int n, const CharsetRec * self)
 	    return -1;
     case T_9494:
     case T_9696:
-        if(IS_GL(n>>8) && IS_GL(n&0xFF))
-            return n;
-        else
-            return -1;
+	if (IS_GL(n >> 8) && IS_GL(n & 0xFF))
+	    return n;
+	else
+	    return -1;
     case T_94192:
-        if(IS_GL(n>>8) && IS_GL(n&0x7F))
-            return n;
-        else
-            return -1;
+	if (IS_GL(n >> 8) && IS_GL(n & 0x7F))
+	    return n;
+	else
+	    return -1;
     default:
-        abort();
+	abort();
 	/* NOTREACHED */
     }
 #undef IS_GL
@@ -161,9 +161,9 @@ static FontencCharsetRec fontencCharsets[] =
 
 typedef struct _OtherCharset {
     const char *name;
-    int (*init)(OtherStatePtr);
-    unsigned int (*mapping)(unsigned int, OtherStatePtr);
-    unsigned int (*reverse)(unsigned int, OtherStatePtr);
+    int (*init) (OtherStatePtr);
+    unsigned int (*mapping) (unsigned int, OtherStatePtr);
+    unsigned int (*reverse) (unsigned int, OtherStatePtr);
     int (*stack) (unsigned, OtherStatePtr);
 } OtherCharsetRec, *OtherCharsetPtr;
 
@@ -180,16 +180,16 @@ static const OtherCharsetRec otherCharsets[] =
 static int
 compare(const char *s, const char *t)
 {
-    while(*s || *t) {
+    while (*s || *t) {
 	if (*s && (isspace(UChar(*s)) || *s == '-' || *s == '_'))
-            s++;
+	    s++;
 	else if (*t && (isspace(UChar(*t)) || *t == '-' || *t == '_'))
-            t++;
+	    t++;
 	else if (*s && *t && tolower(UChar(*s)) == tolower(UChar(*t))) {
-            s++; 
-            t++;
-        } else
-            return 1;
+	    s++;
+	    t++;
+	} else
+	    return 1;
     }
     return 0;
 }
@@ -209,13 +209,13 @@ FontencCharsetReverse(unsigned int i, const CharsetRec * self)
     unsigned n;
 
     n = fc->reverse->reverse(i, fc->reverse->data);
-    if(n == 0 || n < fc->shift)
-        return -1;
+    if (n == 0 || n < fc->shift)
+	return -1;
     else
-        n -= fc->shift;
+	n -= fc->shift;
 
 #define IS_GL(n) ((n) >= 0x20 && (n) < 0x80)
-    switch(self->type) {
+    switch (self->type) {
     case T_94:
     case T_96:
 	if (IS_GL(n))
@@ -229,17 +229,17 @@ FontencCharsetReverse(unsigned int i, const CharsetRec * self)
 	    return -1;
     case T_9494:
     case T_9696:
-        if(IS_GL(n>>8) && IS_GL(n&0xFF))
+	if (IS_GL(n >> 8) && IS_GL(n & 0xFF))
 	    return (int) n;
-        else
-            return -1;
+	else
+	    return -1;
     case T_94192:
-        if(IS_GL(n>>8) && IS_GL(n&0x7F))
+	if (IS_GL(n >> 8) && IS_GL(n & 0x7F))
 	    return (int) n;
-        else
-            return -1;
+	else
+	    return -1;
     default:
-        abort();
+	abort();
 	/* NOTREACHED */
     }
 #undef IS_GL
@@ -247,15 +247,15 @@ FontencCharsetReverse(unsigned int i, const CharsetRec * self)
 
 static CharsetPtr cachedCharsets = NULL;
 
-static CharsetPtr 
+static CharsetPtr
 getCachedCharset(unsigned final, int type, const char *name)
 {
     CharsetPtr c;
-    for(c = cachedCharsets; c; c = c->next) {
-        if(((c->type == type && c->final == final) ||
-            (name && !compare(c->name, name))) &&
-           (c->type != T_FAILED))
-            return c;
+    for (c = cachedCharsets; c; c = c->next) {
+	if (((c->type == type && c->final == final) ||
+	     (name && !compare(c->name, name))) &&
+	    (c->type != T_FAILED))
+	    return c;
     }
     return NULL;
 }
@@ -276,31 +276,31 @@ getFontencCharset(unsigned final, int type, const char *name)
     FontMapReversePtr reverse;
 
     fc = fontencCharsets;
-    while(fc->name) {
-        if(((fc->type == type && fc->final == final) ||
-            (name && !compare(fc->name, name))) &&
-           (fc->type != T_FAILED))
-            break;
-        fc++;
+    while (fc->name) {
+	if (((fc->type == type && fc->final == final) ||
+	     (name && !compare(fc->name, name))) &&
+	    (fc->type != T_FAILED))
+	    break;
+	fc++;
     }
 
-    if(!fc->name)
-        return NULL;
+    if (!fc->name)
+	return NULL;
 
     c = malloc(sizeof(CharsetRec));
-    if(c == NULL)
-        return NULL;
+    if (c == NULL)
+	return NULL;
 
     mapping = FontEncMapFind(fc->xlfd, FONT_ENCODING_UNICODE, -1, -1, NULL);
-    if(!mapping) {
-        fc->type = T_FAILED;
-        return NULL;
+    if (!mapping) {
+	fc->type = T_FAILED;
+	return NULL;
     }
 
     reverse = FontMapReverse(mapping);
-    if(!reverse) {
-        fc->type = T_FAILED;
-        return NULL;
+    if (!reverse) {
+	fc->type = T_FAILED;
+	return NULL;
     }
 
     fc->mapping = mapping;
@@ -325,23 +325,23 @@ getOtherCharset(const char *name)
     OtherStatePtr s;
 
     fc = otherCharsets;
-    while(fc->name) {
-        if(name && !compare(fc->name, name))
-            break;
-        fc++;
+    while (fc->name) {
+	if (name && !compare(fc->name, name))
+	    break;
+	fc++;
     }
 
-    if(!fc->name)
-        return NULL;
+    if (!fc->name)
+	return NULL;
 
     c = malloc(sizeof(CharsetRec));
-    if(c == NULL)
-        return NULL;
+    if (c == NULL)
+	return NULL;
 
     s = malloc(sizeof(OtherState));
-    if(s == NULL) {
-        free(c);
-        return NULL;
+    if (s == NULL) {
+	free(c);
+	return NULL;
     }
 
     c->name = fc->name;
@@ -353,9 +353,9 @@ getOtherCharset(const char *name)
     c->other_stack = fc->stack;
     c->other_aux = s;
 
-    if(!fc->init(s)) {
-        c->type = T_FAILED;
-        return NULL;
+    if (!fc->init(s)) {
+	c->type = T_FAILED;
+	return NULL;
     }
 
     cacheCharset(c);
@@ -365,7 +365,7 @@ getOtherCharset(const char *name)
 const CharsetRec *
 getUnknownCharset(int type)
 {
-    switch(type) {
+    switch (type) {
     case T_94:
 	return &Unknown94Charset;
     case T_96:
@@ -385,12 +385,12 @@ getCharset(unsigned final, int type)
     const CharsetRec *c;
 
     c = getCachedCharset(final, type, NULL);
-    if(c)
-        return c;
+    if (c)
+	return c;
 
     c = getFontencCharset(final, type, NULL);
-    if(c)        
-        return c;
+    if (c)
+	return c;
 
     return getUnknownCharset(type);
 }
@@ -400,58 +400,58 @@ getCharsetByName(const char *name)
 {
     const CharsetRec *c;
 
-    if(name == NULL)
-        return getUnknownCharset(T_94);
+    if (name == NULL)
+	return getUnknownCharset(T_94);
 
     c = getCachedCharset(0, 0, name);
-    if(c)
-        return c;
+    if (c)
+	return c;
 
     c = getFontencCharset(0, 0, name);
-    if(c)        
-        return c;
+    if (c)
+	return c;
 
     c = getOtherCharset(name);
-    if(c)        
-        return c;
+    if (c)
+	return c;
 
     return getUnknownCharset(T_94);
 }
 /* *INDENT-OFF* */
 static const LocaleCharsetRec localeCharsets[] =
 {
-    { "C", 0, 2, "ASCII", NULL, "ISO 8859-1", NULL, NULL},
-    { "POSIX", 0, 2, "ASCII", NULL, "ISO 8859-1", NULL, NULL},
-    { "ISO8859-1", 0, 2, "ASCII", NULL, "ISO 8859-1", NULL, NULL},
-    { "ISO8859-2", 0, 2, "ASCII", NULL, "ISO 8859-2", NULL, NULL},
-    { "ISO8859-3", 0, 2, "ASCII", NULL, "ISO 8859-3", NULL, NULL},
-    { "ISO8859-4", 0, 2, "ASCII", NULL, "ISO 8859-4", NULL, NULL},
-    { "ISO8859-5", 0, 2, "ASCII", NULL, "ISO 8859-5", NULL, NULL},
-    { "ISO8859-6", 0, 2, "ASCII", NULL, "ISO 8859-6", NULL, NULL},
-    { "ISO8859-7", 0, 2, "ASCII", NULL, "ISO 8859-7", NULL, NULL},
-    { "ISO8859-8", 0, 2, "ASCII", NULL, "ISO 8859-8", NULL, NULL},
-    { "ISO8859-9", 0, 2, "ASCII", NULL, "ISO 8859-9", NULL, NULL},
-    { "ISO8859-10", 0, 2, "ASCII", NULL, "ISO 8859-10", NULL, NULL},
-    { "ISO8859-11", 0, 2, "ASCII", NULL, "ISO 8859-11", NULL, NULL},
-    { "TIS620", 0, 2, "ASCII", NULL, "ISO 8859-11", NULL, NULL},
-    { "ISO8859-13", 0, 2, "ASCII", NULL, "ISO 8859-13", NULL, NULL},
-    { "ISO8859-14", 0, 2, "ASCII", NULL, "ISO 8859-14", NULL, NULL},
-    { "ISO8859-15", 0, 2, "ASCII", NULL, "ISO 8859-15", NULL, NULL},
-    { "ISO8859-16", 0, 2, "ASCII", NULL, "ISO 8859-16", NULL, NULL},
-    { "KOI8-R", 0, 2, "ASCII", NULL, "KOI8-R", NULL, NULL},
-    { "CP1251", 0, 2, "ASCII", NULL, "CP 1251", NULL, NULL},
-    { "TCVN", 0, 2, "ASCII", NULL, "TCVN", NULL, NULL},
-    { "eucCN", 0, 1, "ASCII", "GB 2312", NULL, NULL, NULL},
-    { "GB2312", 0, 1, "ASCII", "GB 2312", NULL, NULL, NULL},
-    { "eucJP", 0, 1, "ASCII", "JIS X 0208", "JIS X 0201:GR", "JIS X 0212", NULL},
-    { "eucKR", 0, 1, "ASCII", "KSC 5601", NULL, NULL, NULL},
-    { "eucCN", 0, 1, "ASCII", "GB 2312", NULL, NULL, NULL},
-    { "Big5", 0, 1, "ASCII", "Big 5", NULL, NULL, NULL},
-    { "gbk", 0, 1, NULL, NULL, NULL, NULL, "GBK"},
-    { "UTF-8", 0, 1, NULL, NULL, NULL, NULL, "UTF-8"},
-    { "SJIS", 0, 1, NULL, NULL, NULL, NULL, "SJIS"},
-    { "Big5-HKSCS", 0, 1, NULL, NULL, NULL, NULL, "BIG5-HKSCS"},
-    { "gb18030", 0, 1, NULL, NULL, NULL, NULL, "GB18030"},
+    {"C",          0, 2, "ASCII", NULL,         "ISO 8859-1",    NULL,         NULL},
+    {"POSIX",      0, 2, "ASCII", NULL,         "ISO 8859-1",    NULL,         NULL},
+    {"ISO8859-1",  0, 2, "ASCII", NULL,         "ISO 8859-1",    NULL,         NULL},
+    {"ISO8859-2",  0, 2, "ASCII", NULL,         "ISO 8859-2",    NULL,         NULL},
+    {"ISO8859-3",  0, 2, "ASCII", NULL,         "ISO 8859-3",    NULL,         NULL},
+    {"ISO8859-4",  0, 2, "ASCII", NULL,         "ISO 8859-4",    NULL,         NULL},
+    {"ISO8859-5",  0, 2, "ASCII", NULL,         "ISO 8859-5",    NULL,         NULL},
+    {"ISO8859-6",  0, 2, "ASCII", NULL,         "ISO 8859-6",    NULL,         NULL},
+    {"ISO8859-7",  0, 2, "ASCII", NULL,         "ISO 8859-7",    NULL,         NULL},
+    {"ISO8859-8",  0, 2, "ASCII", NULL,         "ISO 8859-8",    NULL,         NULL},
+    {"ISO8859-9",  0, 2, "ASCII", NULL,         "ISO 8859-9",    NULL,         NULL},
+    {"ISO8859-10", 0, 2, "ASCII", NULL,         "ISO 8859-10",   NULL,         NULL},
+    {"ISO8859-11", 0, 2, "ASCII", NULL,         "ISO 8859-11",   NULL,         NULL},
+    {"TIS620",     0, 2, "ASCII", NULL,         "ISO 8859-11",   NULL,         NULL},
+    {"ISO8859-13", 0, 2, "ASCII", NULL,         "ISO 8859-13",   NULL,         NULL},
+    {"ISO8859-14", 0, 2, "ASCII", NULL,         "ISO 8859-14",   NULL,         NULL},
+    {"ISO8859-15", 0, 2, "ASCII", NULL,         "ISO 8859-15",   NULL,         NULL},
+    {"ISO8859-16", 0, 2, "ASCII", NULL,         "ISO 8859-16",   NULL,         NULL},
+    {"KOI8-R",     0, 2, "ASCII", NULL,         "KOI8-R",        NULL,         NULL},
+    {"CP1251",     0, 2, "ASCII", NULL,         "CP 1251",       NULL,         NULL},
+    {"TCVN",       0, 2, "ASCII", NULL,         "TCVN",          NULL,         NULL},
+    {"eucCN",      0, 1, "ASCII", "GB 2312",    NULL,            NULL,         NULL},
+    {"GB2312",     0, 1, "ASCII", "GB 2312",    NULL,            NULL,         NULL},
+    {"eucJP",      0, 1, "ASCII", "JIS X 0208", "JIS X 0201:GR", "JIS X 0212", NULL},
+    {"eucKR",      0, 1, "ASCII", "KSC 5601",   NULL,            NULL,         NULL},
+    {"eucCN",      0, 1, "ASCII", "GB 2312",    NULL,            NULL,         NULL},
+    {"Big5",       0, 1, "ASCII", "Big 5",      NULL,            NULL,         NULL},
+    {"gbk",        0, 1, NULL,    NULL,         NULL,            NULL,         "GBK"},
+    {"UTF-8",      0, 1, NULL,    NULL,         NULL,            NULL,         "UTF-8"},
+    {"SJIS",       0, 1, NULL,    NULL,         NULL,            NULL,         "SJIS"},
+    {"Big5-HKSCS", 0, 1, NULL,    NULL,         NULL,            NULL,         "BIG5-HKSCS"},
+    {"gb18030",    0, 1, NULL,    NULL,         NULL,            NULL,         "GB18030"},
     {0,            0, 0, 0,       0,            0,               0,            0}
 };
 /* *INDENT-ON* */
@@ -462,12 +462,12 @@ reportCharsets(void)
     const LocaleCharsetRec *p;
     FontencCharsetPtr q;
     printf("Known locale encodings:\n\n");
-    for(p = localeCharsets; p->name; p++) {
-        if(p->other) {
-            printf("  %s (non-ISO-2022 encoding)\n", p->other);
+    for (p = localeCharsets; p->name; p++) {
+	if (p->other) {
+	    printf("  %s (non-ISO-2022 encoding)\n", p->other);
 	    continue;
-        }
-        printf("  %s: GL -> G%d, GR -> G%d", p->name, p->gl, p->gr);
+	}
+	printf("  %s: GL -> G%d, GR -> G%d", p->name, p->gl, p->gr);
 	if (p->g0)
 	    printf(", G0: %s", p->g0);
 	if (p->g1)
@@ -476,19 +476,19 @@ reportCharsets(void)
 	    printf(", G2: %s", p->g2);
 	if (p->g3)
 	    printf(", G3: %s", p->g3);
-        printf("\n");
+	printf("\n");
     }
 
     printf("\n\nKnown charsets (not all may be available):\n\n");
-    for(q = fontencCharsets; q->name; q++)
-        printf("  %s%s\n", 
-               q->name, q->final?" (ISO 2022)":"");
+    for (q = fontencCharsets; q->name; q++)
+	printf("  %s%s\n",
+	       q->name, q->final ? " (ISO 2022)" : "");
 }
 
 int
 getLocaleState(const char *locale,
 	       const char *charset,
-               int *gl_return, int *gr_return,
+	       int *gl_return, int *gr_return,
 	       const CharsetRec * *g0_return,
 	       const CharsetRec * *g1_return,
 	       const CharsetRec * *g2_return,
@@ -499,36 +499,36 @@ getLocaleState(const char *locale,
     char *resolved = 0;
     const LocaleCharsetRec *p;
 
-    if(!charset) {
-        resolved = resolveLocale(locale);
-        if(!resolved)
-            return -1;
-        charset = strrchr(resolved, '.');
-        if(charset)
-            charset++;
-        else
-            charset = resolved;
+    if (!charset) {
+	resolved = resolveLocale(locale);
+	if (!resolved)
+	    return -1;
+	charset = strrchr(resolved, '.');
+	if (charset)
+	    charset++;
+	else
+	    charset = resolved;
     }
 
-    for(p = localeCharsets; p->name; p++) {
-        if(compare(p->name, charset) == 0)
-            break;
+    for (p = localeCharsets; p->name; p++) {
+	if (compare(p->name, charset) == 0)
+	    break;
     }
 
-    if(p->name == NULL) {
+    if (p->name == NULL) {
 	result = -1;
     } else {
 
-    *gl_return = p->gl;
-    *gr_return = p->gr;
-    *g0_return = getCharsetByName(p->g0);
-    *g1_return = getCharsetByName(p->g1);
-    *g2_return = getCharsetByName(p->g2);
-    *g3_return = getCharsetByName(p->g3);
-    if(p->other)
-        *other_return = getCharsetByName(p->other);
-    else
-        *other_return = NULL;
+	*gl_return = p->gl;
+	*gr_return = p->gr;
+	*g0_return = getCharsetByName(p->g0);
+	*g1_return = getCharsetByName(p->g1);
+	*g2_return = getCharsetByName(p->g2);
+	*g3_return = getCharsetByName(p->g3);
+	if (p->other)
+	    *other_return = getCharsetByName(p->other);
+	else
+	    *other_return = NULL;
     }
     if (resolved != 0)
 	free(resolved);

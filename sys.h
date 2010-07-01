@@ -34,7 +34,7 @@ extern int ignore_unused;
 int waitForOutput(int fd);
 int waitForInput(int fd1, int fd2);
 int setWindowSize(int sfd, int dfd);
-int installHandler(int signum, void (*handler)(int));
+int installHandler(int signum, void (*handler) (int));
 int copyTermios(int sfd, int dfd);
 int saveTermios(void);
 int restoreTermios(void);

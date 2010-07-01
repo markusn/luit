@@ -49,8 +49,8 @@ typedef struct _Charset {
     const void *data;
     int (*other_stack) (unsigned c, OtherStatePtr aux);
     OtherState *other_aux;
-    unsigned int (*other_recode)(unsigned int c, OtherStatePtr aux);
-    unsigned int (*other_reverse)(unsigned int c, OtherStatePtr aux);
+    unsigned int (*other_recode) (unsigned int c, OtherStatePtr aux);
+    unsigned int (*other_reverse) (unsigned int c, OtherStatePtr aux);
     struct _Charset *next;
 } CharsetRec, *CharsetPtr;
 
@@ -70,7 +70,7 @@ const CharsetRec *getCharset(unsigned, int);
 const CharsetRec *getCharsetByName(const char *);
 void reportCharsets(void);
 int getLocaleState(const char *locale, const char *charset,
-                   int *gl_return, int *gr_return,
+		   int *gl_return, int *gr_return,
 		   const CharsetRec * *g0_return,
 		   const CharsetRec * *g1_return,
 		   const CharsetRec * *g2_return,

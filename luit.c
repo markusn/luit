@@ -64,7 +64,7 @@ static volatile int sigwinch_queued = 0;
 static volatile int sigchld_queued = 0;
 
 static int convert(int, int);
-static int condom(int, char**);
+static int condom(int, char **);
 
 static void
 ErrorF(const char *f,...)
@@ -88,18 +88,18 @@ FatalError(const char *f,...)
 static void
 help(void)
 {
-    fprintf(stderr, 
-            "luit\n"
+    fprintf(stderr,
+	    "luit\n"
 	    "  [ -V ] [ -h ] [ -list ] [ -v ] [ -argv0 name ]\n"
-            "  [ -gl gn ] [-gr gk] "
-            "[ -g0 set ] [ -g1 set ] "
-            "[ -g2 set ] [ -g3 set ]\n"
-            "  [ -encoding encoding ] "
-            "[ +oss ] [ +ols ] [ +osl ] [ +ot ]\n"
-            "  [ -kgl gn ] [-kgr gk] "
-            "[ -kg0 set ] [ -kg1 set ] "
-            "[ -kg2 set ] [ -kg3 set ]\n"
-            "  [ -k7 ] [ +kss ] [ +kssgr ] [ -kls ]\n"
+	    "  [ -gl gn ] [-gr gk] "
+	    "[ -g0 set ] [ -g1 set ] "
+	    "[ -g2 set ] [ -g3 set ]\n"
+	    "  [ -encoding encoding ] "
+	    "[ +oss ] [ +ols ] [ +osl ] [ +ot ]\n"
+	    "  [ -kgl gn ] [-kgr gk] "
+	    "[ -kg0 set ] [ -kg1 set ] "
+	    "[ -kg2 set ] [ -kg3 set ]\n"
+	    "  [ -k7 ] [ +kss ] [ +kssgr ] [ -kls ]\n"
 	    "  [ -c ] "
 	    "[ -p ] "
 	    "[ -x ] "
@@ -107,206 +107,206 @@ help(void)
 	    "[ -olog filename ] "
 	    "[ -alias filename ] "
 	    "[ -- ]\n"
-            "  [ program [ args ] ]\n");
+	    "  [ program [ args ] ]\n");
 }
-            
+
 static int
 parseOptions(int argc, char **argv)
 {
     int i = 1;
-    while(i < argc) {
-        if(argv[i][0] != '-' && argv[i][0] != '+') {
-            break;
-        } else if(!strcmp(argv[i], "--")) {
-            i++;
-            break;
-        } else if(!strcmp(argv[i], "-v")) {
-            verbose++;
-            i++;
+    while (i < argc) {
+	if (argv[i][0] != '-' && argv[i][0] != '+') {
+	    break;
+	} else if (!strcmp(argv[i], "--")) {
+	    i++;
+	    break;
+	} else if (!strcmp(argv[i], "-v")) {
+	    verbose++;
+	    i++;
 	} else if (!strcmp(argv[i], "-V")) {
 	    printf("%s - %s\n", argv[0], VERSION);
 	    ExitProgram(0);
-        } else if(!strcmp(argv[i], "-h")) {
-            help();
+	} else if (!strcmp(argv[i], "-h")) {
+	    help();
 	    ExitProgram(0);
-        } else if(!strcmp(argv[i], "-list")) {
-            reportCharsets();
+	} else if (!strcmp(argv[i], "-list")) {
+	    reportCharsets();
 	    ExitProgram(0);
-        } else if(!strcmp(argv[i], "+oss")) {
-            outputState->outputFlags &= ~OF_SS;
-            i++;
-        } else if(!strcmp(argv[i], "+ols")) {
-            outputState->outputFlags &= ~OF_LS;
-            i++;
-        } else if(!strcmp(argv[i], "+osl")) {
-            outputState->outputFlags &= ~OF_SELECT;
-            i++;
-        } else if(!strcmp(argv[i], "+ot")) {
-            outputState->outputFlags = OF_PASSTHRU;
-            i++;
-        } else if(!strcmp(argv[i], "-k7")) {
-            inputState->inputFlags &= ~IF_EIGHTBIT;
-            i++;
-        } else if(!strcmp(argv[i], "+kss")) {
-            inputState->inputFlags &= ~IF_SS;
-            i++;
-        } else if(!strcmp(argv[1], "+kssgr")) {
-            inputState->inputFlags &= ~IF_SSGR;
-            i++;
-        } else if(!strcmp(argv[i], "-kls")) {
-            inputState->inputFlags |= IF_LS;
-            i++;
-        } else if(!strcmp(argv[i], "-g0")) {
-            if(i + 1 >= argc)
-                FatalError("-g0 requires an argument\n");
-            G0(outputState) = getCharsetByName(argv[i + 1]);
-            i += 2;
-        } else if(!strcmp(argv[i], "-g1")) {
-            if(i + 1 >= argc)
-                FatalError("-g1 requires an argument\n");
-            G1(outputState) = getCharsetByName(argv[i + 1]);
-            i += 2;
-        } else if(!strcmp(argv[i], "-g2")) {
-            if(i + 1 >= argc)
-                FatalError("-g2 requires an argument\n");
-            G2(outputState) = getCharsetByName(argv[i + 1]);
-            i += 2;
-        } else if(!strcmp(argv[i], "-g3")) {
-            if(i + 1 >= argc)
-                FatalError("-g3 requires an argument\n");
-            G3(outputState) = getCharsetByName(argv[i + 1]);
+	} else if (!strcmp(argv[i], "+oss")) {
+	    outputState->outputFlags &= ~OF_SS;
+	    i++;
+	} else if (!strcmp(argv[i], "+ols")) {
+	    outputState->outputFlags &= ~OF_LS;
+	    i++;
+	} else if (!strcmp(argv[i], "+osl")) {
+	    outputState->outputFlags &= ~OF_SELECT;
+	    i++;
+	} else if (!strcmp(argv[i], "+ot")) {
+	    outputState->outputFlags = OF_PASSTHRU;
+	    i++;
+	} else if (!strcmp(argv[i], "-k7")) {
+	    inputState->inputFlags &= ~IF_EIGHTBIT;
+	    i++;
+	} else if (!strcmp(argv[i], "+kss")) {
+	    inputState->inputFlags &= ~IF_SS;
+	    i++;
+	} else if (!strcmp(argv[1], "+kssgr")) {
+	    inputState->inputFlags &= ~IF_SSGR;
+	    i++;
+	} else if (!strcmp(argv[i], "-kls")) {
+	    inputState->inputFlags |= IF_LS;
+	    i++;
+	} else if (!strcmp(argv[i], "-g0")) {
+	    if (i + 1 >= argc)
+		FatalError("-g0 requires an argument\n");
+	    G0(outputState) = getCharsetByName(argv[i + 1]);
+	    i += 2;
+	} else if (!strcmp(argv[i], "-g1")) {
+	    if (i + 1 >= argc)
+		FatalError("-g1 requires an argument\n");
+	    G1(outputState) = getCharsetByName(argv[i + 1]);
+	    i += 2;
+	} else if (!strcmp(argv[i], "-g2")) {
+	    if (i + 1 >= argc)
+		FatalError("-g2 requires an argument\n");
+	    G2(outputState) = getCharsetByName(argv[i + 1]);
+	    i += 2;
+	} else if (!strcmp(argv[i], "-g3")) {
+	    if (i + 1 >= argc)
+		FatalError("-g3 requires an argument\n");
+	    G3(outputState) = getCharsetByName(argv[i + 1]);
 
-            i += 2;
-        } else if(!strcmp(argv[i], "-gl")) {
-            int j;
-            if(i + 1 >= argc)
-                FatalError("-gl requires an argument\n");
-            if(strlen(argv[i + 1]) != 2 ||
-               argv[i + 1][0] != 'g')
-                j = -1;
-            else 
-                j = argv[i + 1][1] - '0';
-            if(j < 0 || j > 3)
-                FatalError("The argument of -gl "
-                           "should be one of g0 through g3,\n"
-                           "not %s\n", argv[i + 1]);
-            else
-                outputState->glp = &outputState->g[j];
-            i += 2;
-        } else if(!strcmp(argv[i], "-gr")) {
-            int j;
-            if(i + 1 >= argc)
-                FatalError("-gr requires an argument\n");
-            if(strlen(argv[i + 1]) != 2 ||
-               argv[i + 1][0] != 'g')
-                j = -1;
-            else 
-                j = argv[i + 1][1] - '0';
-            if(j < 0 || j > 3)
-                FatalError("The argument of -gl "
-                           "should be one of g0 through g3,\n"
-                           "not %s\n", argv[i + 1]);
-            else
-                outputState->grp = &outputState->g[j];
-            i += 2;
-        } else if(!strcmp(argv[i], "-kg0")) {
-            if(i + 1 >= argc)
-                FatalError("-kg0 requires an argument\n");
-            G0(inputState) = getCharsetByName(argv[i + 1]);
-            i += 2;
-        } else if(!strcmp(argv[i], "-kg1")) {
-            if(i + 1 >= argc)
-                FatalError("-kg1 requires an argument\n");
-            G1(inputState) = getCharsetByName(argv[i + 1]);
-            i += 2;
-        } else if(!strcmp(argv[i], "-kg2")) {
-            if(i + 1 >= argc)
-                FatalError("-kg2 requires an argument\n");
-            G2(inputState) = getCharsetByName(argv[i + 1]);
-            i += 2;
-        } else if(!strcmp(argv[i], "-kg3")) {
-            if(i + 1 >= argc)
-                FatalError("-kg3 requires an argument\n");
-            G3(inputState) = getCharsetByName(argv[i + 1]);
+	    i += 2;
+	} else if (!strcmp(argv[i], "-gl")) {
+	    int j;
+	    if (i + 1 >= argc)
+		FatalError("-gl requires an argument\n");
+	    if (strlen(argv[i + 1]) != 2 ||
+		argv[i + 1][0] != 'g')
+		j = -1;
+	    else
+		j = argv[i + 1][1] - '0';
+	    if (j < 0 || j > 3)
+		FatalError("The argument of -gl "
+			   "should be one of g0 through g3,\n"
+			   "not %s\n", argv[i + 1]);
+	    else
+		outputState->glp = &outputState->g[j];
+	    i += 2;
+	} else if (!strcmp(argv[i], "-gr")) {
+	    int j;
+	    if (i + 1 >= argc)
+		FatalError("-gr requires an argument\n");
+	    if (strlen(argv[i + 1]) != 2 ||
+		argv[i + 1][0] != 'g')
+		j = -1;
+	    else
+		j = argv[i + 1][1] - '0';
+	    if (j < 0 || j > 3)
+		FatalError("The argument of -gl "
+			   "should be one of g0 through g3,\n"
+			   "not %s\n", argv[i + 1]);
+	    else
+		outputState->grp = &outputState->g[j];
+	    i += 2;
+	} else if (!strcmp(argv[i], "-kg0")) {
+	    if (i + 1 >= argc)
+		FatalError("-kg0 requires an argument\n");
+	    G0(inputState) = getCharsetByName(argv[i + 1]);
+	    i += 2;
+	} else if (!strcmp(argv[i], "-kg1")) {
+	    if (i + 1 >= argc)
+		FatalError("-kg1 requires an argument\n");
+	    G1(inputState) = getCharsetByName(argv[i + 1]);
+	    i += 2;
+	} else if (!strcmp(argv[i], "-kg2")) {
+	    if (i + 1 >= argc)
+		FatalError("-kg2 requires an argument\n");
+	    G2(inputState) = getCharsetByName(argv[i + 1]);
+	    i += 2;
+	} else if (!strcmp(argv[i], "-kg3")) {
+	    if (i + 1 >= argc)
+		FatalError("-kg3 requires an argument\n");
+	    G3(inputState) = getCharsetByName(argv[i + 1]);
 
-            i += 2;
-        } else if(!strcmp(argv[i], "-kgl")) {
-            int j;
-            if(i + 1 >= argc)
-                FatalError("-kgl requires an argument\n");
-            if(strlen(argv[i + 1]) != 2 ||
-               argv[i + 1][0] != 'g')
-                j = -1;
-            else 
-                j = argv[i + 1][1] - '0';
-            if(j < 0 || j > 3)
-                FatalError("The argument of -kgl "
-                           "should be one of g0 through g3,\n"
-                           "not %s\n", argv[i + 1]);
-            else
-                inputState->glp = &inputState->g[j];
-            i += 2;
-        } else if(!strcmp(argv[i], "-kgr")) {
-            int j;
-            if(i + 1 >= argc)
-                FatalError("-kgl requires an argument\n");
-            if(strlen(argv[i + 1]) != 2 ||
-               argv[i + 1][0] != 'g')
-                j = -1;
-            else 
-                j = argv[i + 1][1] - '0';
-            if(j < 0 || j > 3)
-                FatalError("The argument of -kgl "
-                           "should be one of g0 through g3,\n"
-                           "not %s\n", argv[i + 1]);
-            else
-                inputState->grp = &inputState->g[j];
-            i += 2;
-        } else if(!strcmp(argv[i], "-argv0")) {
-            if(i + 1 >= argc)
-                FatalError("-argv0 requires an argument\n");
-            child_argv0 = argv[i + 1];
-            i += 2;
-        } else if(!strcmp(argv[i], "-x")) {
-            exitOnChild = 1;
-            i++;
-        } else if(!strcmp(argv[i], "-c")) {
-            converter = 1;
-            i++;
-        } else if(!strcmp(argv[i], "-ilog")) {
-            if(i + 1 >= argc)
-                FatalError("-ilog requires an argument\n");
-            ilog = open(argv[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-            if(ilog < 0) {
-                perror("Couldn't open input log");
+	    i += 2;
+	} else if (!strcmp(argv[i], "-kgl")) {
+	    int j;
+	    if (i + 1 >= argc)
+		FatalError("-kgl requires an argument\n");
+	    if (strlen(argv[i + 1]) != 2 ||
+		argv[i + 1][0] != 'g')
+		j = -1;
+	    else
+		j = argv[i + 1][1] - '0';
+	    if (j < 0 || j > 3)
+		FatalError("The argument of -kgl "
+			   "should be one of g0 through g3,\n"
+			   "not %s\n", argv[i + 1]);
+	    else
+		inputState->glp = &inputState->g[j];
+	    i += 2;
+	} else if (!strcmp(argv[i], "-kgr")) {
+	    int j;
+	    if (i + 1 >= argc)
+		FatalError("-kgl requires an argument\n");
+	    if (strlen(argv[i + 1]) != 2 ||
+		argv[i + 1][0] != 'g')
+		j = -1;
+	    else
+		j = argv[i + 1][1] - '0';
+	    if (j < 0 || j > 3)
+		FatalError("The argument of -kgl "
+			   "should be one of g0 through g3,\n"
+			   "not %s\n", argv[i + 1]);
+	    else
+		inputState->grp = &inputState->g[j];
+	    i += 2;
+	} else if (!strcmp(argv[i], "-argv0")) {
+	    if (i + 1 >= argc)
+		FatalError("-argv0 requires an argument\n");
+	    child_argv0 = argv[i + 1];
+	    i += 2;
+	} else if (!strcmp(argv[i], "-x")) {
+	    exitOnChild = 1;
+	    i++;
+	} else if (!strcmp(argv[i], "-c")) {
+	    converter = 1;
+	    i++;
+	} else if (!strcmp(argv[i], "-ilog")) {
+	    if (i + 1 >= argc)
+		FatalError("-ilog requires an argument\n");
+	    ilog = open(argv[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	    if (ilog < 0) {
+		perror("Couldn't open input log");
 		ExitProgram(1);
-            }
-            i += 2;
-        } else if(!strcmp(argv[i], "-olog")) {
-            if(i + 1 >= argc)
-                FatalError("-olog requires an argument\n");
-            olog = open(argv[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-            if(olog < 0) {
-                perror("Couldn't open output log");
+	    }
+	    i += 2;
+	} else if (!strcmp(argv[i], "-olog")) {
+	    if (i + 1 >= argc)
+		FatalError("-olog requires an argument\n");
+	    olog = open(argv[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	    if (olog < 0) {
+		perror("Couldn't open output log");
 		ExitProgram(1);
-            }
-            i += 2;
+	    }
+	    i += 2;
 	} else if (!strcmp(argv[i], "-alias")) {
 	    if (i + 1 >= argc)
 		FatalError("-alias requires an argument\n");
 	    locale_alias = argv[i + 1];
 	    i += 2;
-        } else if(!strcmp(argv[i], "-encoding")) {
-            if(i + 1 >= argc)
-                FatalError("-encoding requires an argument\n");
+	} else if (!strcmp(argv[i], "-encoding")) {
+	    if (i + 1 >= argc)
+		FatalError("-encoding requires an argument\n");
 	    locale_name = argv[i + 1];
-            i += 2;
+	    i += 2;
 	} else if (!strcmp(argv[i], "-p")) {
 	    pipe_option = 1;
 	    i += 1;
-        } else {
-            FatalError("Unknown option %s\n", argv[i]);
-        }
+	} else {
+	    FatalError("Unknown option %s\n", argv[i]);
+	}
     }
     return i;
 }
@@ -320,40 +320,40 @@ parseArgs(int argc, char **argv,
     char *path = NULL;
     char **child_argv = NULL;
 
-    if(argc <= 0) {
-        char *shell;
-        shell = getenv("SHELL");
-        if(shell) {
+    if (argc <= 0) {
+	char *shell;
+	shell = getenv("SHELL");
+	if (shell) {
 	    path = strmalloc(shell);
 	    if (!path)
 		goto bail;
-        } else {
+	} else {
 	    path = strmalloc("/bin/sh");
-        if(!path)
-            goto bail;
+	    if (!path)
+		goto bail;
 	}
-        child_argv = malloc(2 * sizeof(char*));
-        if(!child_argv)
-            goto bail;
-        if(argv0)
-            child_argv[0] = argv0;
-        else
-            child_argv[0] = my_basename(path);
-        child_argv[1] = NULL;
+	child_argv = malloc(2 * sizeof(char *));
+	if (!child_argv)
+	    goto bail;
+	if (argv0)
+	    child_argv[0] = argv0;
+	else
+	    child_argv[0] = my_basename(path);
+	child_argv[1] = NULL;
     } else {
 	path = strmalloc(argv[0]);
-        if(!path)
-            goto bail;
+	if (!path)
+	    goto bail;
 	child_argv = malloc((unsigned) (argc + 1) * sizeof(char *));
-        if(!child_argv) {
-            goto bail;
-        }
-        if(child_argv0)
-            child_argv[0] = argv0;
-        else
-            child_argv[0] = my_basename(argv[0]);
+	if (!child_argv) {
+	    goto bail;
+	}
+	if (child_argv0)
+	    child_argv[0] = argv0;
+	else
+	    child_argv[0] = my_basename(argv[0]);
 	memcpy(child_argv + 1, argv + 1, (unsigned) (argc - 1) * sizeof(char *));
-        child_argv[argc] = NULL;
+	child_argv[argc] = NULL;
     }
 
     *path_return = path;
@@ -361,13 +361,13 @@ parseArgs(int argc, char **argv,
     return 0;
 
   bail:
-    if(path)
-        free(path);
-    if(argv)
-        free(argv);
+    if (path)
+	free(path);
+    if (argv)
+	free(argv);
     return -1;
 }
-        
+
 int
 main(int argc, char **argv)
 {
@@ -381,47 +381,47 @@ main(int argc, char **argv)
 #endif
 
     l = setlocale(LC_ALL, "");
-    if(!l)
-        ErrorF("Warning: couldn't set locale.\n");
+    if (!l)
+	ErrorF("Warning: couldn't set locale.\n");
 
     inputState = allocIso2022();
-    if(!inputState)
-        FatalError("Couldn't create input state\n");
-        
+    if (!inputState)
+	FatalError("Couldn't create input state\n");
+
     outputState = allocIso2022();
-    if(!outputState)
-        FatalError("Couldn't create output state\n");
-    
-    if(l) {
-        locale_name = setlocale(LC_CTYPE, NULL);
+    if (!outputState)
+	FatalError("Couldn't create output state\n");
+
+    if (l) {
+	locale_name = setlocale(LC_CTYPE, NULL);
     } else {
-        locale_name = getenv("LC_ALL");
-        if(locale_name == NULL) {
-            locale_name = getenv("LC_CTYPE");
-            if(locale_name == NULL) {
-                locale_name = getenv("LANG");
-            }
-        }
+	locale_name = getenv("LC_ALL");
+	if (locale_name == NULL) {
+	    locale_name = getenv("LC_CTYPE");
+	    if (locale_name == NULL) {
+		locale_name = getenv("LANG");
+	    }
+	}
     }
 
-    if(locale_name == NULL) {
-        ErrorF("Couldn't get locale name -- using C\n");
-        locale_name = "C";
+    if (locale_name == NULL) {
+	ErrorF("Couldn't get locale name -- using C\n");
+	locale_name = "C";
     }
 
     i = parseOptions(argc, argv);
-    if(i < 0)
-        FatalError("Couldn't parse options\n");
+    if (i < 0)
+	FatalError("Couldn't parse options\n");
 
     rc = initIso2022(locale_name, NULL, outputState);
     if (rc < 0)
 	FatalError("Couldn't init output state\n");
 
     rc = mergeIso2022(inputState, outputState);
-    if(rc < 0)
-        FatalError("Couldn't init input state\n");
+    if (rc < 0)
+	FatalError("Couldn't init input state\n");
 
-    if(converter)
+    if (converter)
 	rc = convert(0, 1);
     else
 	rc = condom(argc - i, argv + i);
@@ -439,25 +439,25 @@ convert(int ifd, int ofd)
     unsigned char buf[BUFFER_SIZE];
 
     rc = droppriv();
-    if(rc < 0) {
+    if (rc < 0) {
 	perror("Couldn't drop privileges");
 	ExitProgram(1);
     }
 
-    while(1) {
+    while (1) {
 	i = (int) read(ifd, buf, (size_t) BUFFER_SIZE);
-        if(i <= 0) {
-            if(i < 0) {
-                perror("Read error");
+	if (i <= 0) {
+	    if (i < 0) {
+		perror("Read error");
 		ExitProgram(1);
-            }
-            break;
-        }
+	    }
+	    break;
+	}
 	copyOut(outputState, ofd, buf, (unsigned) i);
     }
     return 0;
 }
-        
+
 #ifdef SIGWINCH
 static void
 sigwinchHandler(int sig GCC_UNUSED)
@@ -484,20 +484,20 @@ setup_io(int pty)
     installHandler(SIGCHLD, sigchldHandler);
 
     rc = copyTermios(0, pty);
-    if(rc < 0)
-        FatalError("Couldn't copy terminal settings\n");
+    if (rc < 0)
+	FatalError("Couldn't copy terminal settings\n");
 
     rc = setRawTermios();
-    if(rc < 0)
-        FatalError("Couldn't set terminal to raw\n");
+    if (rc < 0)
+	FatalError("Couldn't set terminal to raw\n");
 
     val = fcntl(0, F_GETFL, 0);
-    if(val >= 0) {
-        fcntl(0, F_SETFL, val | O_NONBLOCK);
+    if (val >= 0) {
+	fcntl(0, F_SETFL, val | O_NONBLOCK);
     }
     val = fcntl(pty, F_GETFL, 0);
-    if(val >= 0) {
-        fcntl(pty, F_SETFL, val | O_NONBLOCK);
+    if (val >= 0) {
+	fcntl(pty, F_SETFL, val | O_NONBLOCK);
     }
 
     setWindowSize(0, pty);
@@ -578,25 +578,25 @@ condom(int argc, char **argv)
     }
 
     pid = fork();
-    if(pid < 0) {
-        perror("Couldn't fork");
+    if (pid < 0) {
+	perror("Couldn't fork");
 	ExitProgram(1);
     }
 
-    if(pid == 0) {
-        close(pty);
+    if (pid == 0) {
+	close(pty);
 	if (pipe_option) {
 	    close_waitpipe(1);
 	}
-        child(line, path, child_argv);
+	child(line, path, child_argv);
     } else {
 	if (pipe_option) {
 	    close_waitpipe(0);
 	}
-        free(child_argv);
-        free(path);
-        free(line);
-        parent(pid, pty);
+	free(child_argv);
+	free(path);
+	free(line);
+	parent(pid, pty);
     }
 
     return 0;
@@ -613,30 +613,30 @@ child(char *line, char *path, char *const argv[])
     close(2);
 
     pgrp = setsid();
-    if(pgrp < 0) {
-        kill(getppid(), SIGABRT);
+    if (pgrp < 0) {
+	kill(getppid(), SIGABRT);
 	ExitProgram(1);
     }
 
     tty = openTty(line);
-    if(tty < 0) {
-        kill(getppid(), SIGABRT);
+    if (tty < 0) {
+	kill(getppid(), SIGABRT);
 	ExitProgram(1);
     }
     if (pipe_option) {
 	write_waitpipe(c2p_waitpipe);
     }
-    
-    if(tty != 0)
-        dup2(tty, 0);
-    if(tty != 1)
-        dup2(tty, 1);
-    if(tty != 2)
-        dup2(tty, 2);
 
-    if(tty > 2)
-        close(tty);
-    
+    if (tty != 0)
+	dup2(tty, 0);
+    if (tty != 1)
+	dup2(tty, 1);
+    if (tty != 2)
+	dup2(tty, 2);
+
+    if (tty > 2)
+	close(tty);
+
     if (pipe_option) {
 	read_waitpipe(p2c_waitpipe);
 	close_waitpipe(0);
@@ -658,8 +658,8 @@ parent(int pid GCC_UNUSED, int pty)
 	read_waitpipe(c2p_waitpipe);
     }
 
-    if(verbose) {
-        reportIso2022(outputState);
+    if (verbose) {
+	reportIso2022(outputState);
     }
     setup_io(pty);
 
@@ -668,33 +668,33 @@ parent(int pid GCC_UNUSED, int pty)
 	close_waitpipe(1);
     }
 
-    for(;;) {
-        rc = waitForInput(0, pty);
+    for (;;) {
+	rc = waitForInput(0, pty);
 
-        if(sigwinch_queued) {
-            sigwinch_queued = 0;
-            setWindowSize(0, pty);
-        }
+	if (sigwinch_queued) {
+	    sigwinch_queued = 0;
+	    setWindowSize(0, pty);
+	}
 
-        if(sigchld_queued && exitOnChild)
-            break;
+	if (sigchld_queued && exitOnChild)
+	    break;
 
-        if(rc > 0) {
-            if(rc & 2) {
+	if (rc > 0) {
+	    if (rc & 2) {
 		i = (int) read(pty, buf, (size_t) BUFFER_SIZE);
-                if((i == 0) || ((i < 0) && (errno != EAGAIN)))
-                    break;
-                if(i > 0)
+		if ((i == 0) || ((i < 0) && (errno != EAGAIN)))
+		    break;
+		if (i > 0)
 		    copyOut(outputState, 0, buf, (unsigned) i);
-            }
-            if(rc & 1) {
+	    }
+	    if (rc & 1) {
 		i = (int) read(0, buf, (size_t) BUFFER_SIZE);
-                if((i == 0) || ((i < 0) && (errno != EAGAIN)))
-                    break;
-                if(i > 0)
-                    copyIn(inputState, pty, buf, i);
-            }
-        }
+		if ((i == 0) || ((i < 0) && (errno != EAGAIN)))
+		    break;
+		if (i > 0)
+		    copyIn(inputState, pty, buf, i);
+	    }
+	}
     }
 
     restoreTermios();

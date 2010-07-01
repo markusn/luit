@@ -59,15 +59,15 @@ typedef struct {
 } aux_hkscs;
 
 typedef struct {
-    FontMapPtr          cs0_mapping;    /* gb18030.2000-0 */
-    FontMapReversePtr   cs0_reverse;
+    FontMapPtr cs0_mapping;	/* gb18030.2000-0 */
+    FontMapReversePtr cs0_reverse;
 
-    FontMapPtr          cs1_mapping;    /* gb18030.2000-1 */
-    FontMapReversePtr   cs1_reverse;
+    FontMapPtr cs1_mapping;	/* gb18030.2000-1 */
+    FontMapReversePtr cs1_reverse;
 
-    int     linear;     /* set to '1' if stack_gb18030 linearized a 4bytes seq */
-    int     buf[3];
-    int     buf_ptr;
+    int linear;			/* set to '1' if stack_gb18030 linearized a 4bytes seq */
+    int buf[3];
+    int buf_ptr;
 } aux_gb18030;
 
 typedef union {

@@ -25,40 +25,40 @@ THE SOFTWARE.
 
 #include "charset.h"
 
-#define ESC 0x1B
-#define CSI 0x9B
-#define CSI_7 '['
-#define SS2 0x8E
-#define SS2_7 0x4E
-#define SS3 0x8F
-#define SS3_7 0x4F
-#define LS0 0x0F
-#define LS1 0x0E
-#define LS2_7 0x6E
-#define LS3_7 0x6F
+#define ESC    0x1B
+#define CSI    0x9B
+#define CSI_7  '['
+#define SS2    0x8E
+#define SS2_7  0x4E
+#define SS3    0x8F
+#define SS3_7  0x4F
+#define LS0    0x0F
+#define LS1    0x0E
+#define LS2_7  0x6E
+#define LS3_7  0x6F
 #define LS1R_7 0x7E
 #define LS2R_7 0x7D
 #define LS3R_7 0x7C
 
 #define IS_FINAL_ESC(x) (((x) & 0xF0 ) != 0x20)
-#define IS_FINAL_CSI(x) (((x) & 0xF0 ) != 0x20 && (((x) & 0xF0 ) != 0x30)) 
+#define IS_FINAL_CSI(x) (((x) & 0xF0 ) != 0x20 && (((x) & 0xF0 ) != 0x30))
 
-#define P_NORMAL 0
-#define P_ESC 1
-#define P_CSI 2
+#define P_NORMAL    0
+#define P_ESC       1
+#define P_CSI       2
 
-#define S_NORMAL 0
-#define S_SS2 1
-#define S_SS3 2
+#define S_NORMAL    0
+#define S_SS2       1
+#define S_SS3       2
 
-#define IF_SS 1
-#define IF_LS 2
+#define IF_SS       1
+#define IF_LS       2
 #define IF_EIGHTBIT 4
-#define IF_SSGR 8
+#define IF_SSGR     8
 
-#define OF_SS 1
-#define OF_LS 2
-#define OF_SELECT 4
+#define OF_SS       1
+#define OF_LS       2
+#define OF_SELECT   4
 #define OF_PASSTHRU 8
 
 typedef struct _Iso2022 {
@@ -95,7 +95,7 @@ int mergeIso2022(Iso2022Ptr, Iso2022Ptr);
 void reportIso2022(Iso2022Ptr);
 void terminate(Iso2022Ptr, int);
 void terminateEsc(Iso2022Ptr, int, unsigned char *, unsigned);
-void copyIn(Iso2022Ptr, int, unsigned char*, int);
+void copyIn(Iso2022Ptr, int, unsigned char *, int);
 void copyOut(Iso2022Ptr, int, unsigned char *, unsigned);
 
 #endif /* LUIT_ISO2022_H */
