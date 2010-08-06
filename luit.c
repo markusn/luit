@@ -60,7 +60,12 @@ int ilog = -1;
 int olog = -1;
 int verbose = 0;
 
-static volatile int sigwinch_queued = 0;
+#ifdef __APPLE__
+    static volatile int sigwinch_queued = 1;
+#else
+    static volatile int sigwinch_queued = 0;
+#endif
+
 static volatile int sigchld_queued = 0;
 
 static int convert(int, int);
