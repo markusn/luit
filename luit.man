@@ -230,7 +230,7 @@ Charsets with a non-trivial intermediary byte are not yet supported.
 Selecting alternate sets of control characters is not supported and
 will never be.
 .SH SEE ALSO
-xterm(__appmansuffix__), unicode(7), utf-8(7), charsets(7).
+xterm(__appmansuffix__), unicode(__miscmansuffix__), utf-8(__miscmansuffix__), charsets(__miscmansuffix__).
 .nf
 .br
 .I Character Code Structure and Extension Techniques (ISO\ 2022, ECMA-35).
