@@ -17,7 +17,7 @@ luit \- Locale and ISO\ 2022 support for Unicode terminals
 ] [
 .B \-\-
 ] [
-.I program 
+.I program
 [
 .I args
 ] ]
@@ -115,7 +115,7 @@ The default depends on the locale, but is usually
 .TP
 .BI \-gr " gk"
 Set the initial assignment of GR.  The default depends on the locale,
-and is usually 
+and is usually
 .B g2
 except for EUC locales, where it is
 .BR g1 .
@@ -159,7 +159,7 @@ The most typical use of
 .B luit
 is to adapt an instance of
 .B XTerm
-to the locale's encoding.  Current versions of 
+to the locale's encoding.  Current versions of
 .B XTerm
 invoke
 .B luit
