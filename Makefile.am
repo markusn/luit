@@ -22,23 +22,26 @@
 SUBDIRS=man
 bin_PROGRAMS = luit
 
-AM_CFLAGS = $(CWARNFLAGS) $(LUIT_CFLAGS) \
+AM_CFLAGS =		\
+	$(CWARNFLAGS)	\
+	$(LUIT_CFLAGS)	\
 	-DLOCALE_ALIAS_FILE=\"$(LOCALEALIASFILE)\"
+
 luit_LDADD = $(LUIT_LIBS)
 
-luit_SOURCES =	\
-        charset.c \
-        charset.h \
-        iso2022.c \
-        iso2022.h \
-        locale.c \
-        luit.c \
-        luit.h \
-        other.c \
-        other.h \
-        parser.c \
-        parser.h \
-        sys.c \
+luit_SOURCES =		\
+        charset.c	\
+        charset.h	\
+        iso2022.c	\
+        iso2022.h	\
+        locale.c	\
+        luit.c		\
+        luit.h		\
+        other.c		\
+        other.h		\
+        parser.c	\
+        parser.h	\
+        sys.c		\
         sys.h
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
