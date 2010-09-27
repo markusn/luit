@@ -33,8 +33,6 @@ XORG_DEFAULT_OPTIONS
 
 AM_CONFIG_HEADER(config.h)
 
-AC_PROG_CC
-AC_PROG_INSTALL
 AC_CANONICAL_HOST
 
 
@@ -73,6 +71,7 @@ case $host_os in
         OS_CFLAGS=
         ;;
 esac
+AC_SUBST(OS_CFLAGS)
 
 AC_CHECK_HEADERS([pty.h stropts.h sys/ioctl.h sys/param.h sys/poll.h sys/select.h sys/time.h termios.h]) 
 AC_CHECK_FUNCS([grantpt putenv select strdup])
@@ -92,10 +91,6 @@ fi
 
 CF_FUNC_POLL
 CF_SIGWINCH
-
-LUIT_CFLAGS="$LUIT_CFLAGS $OS_CFLAGS"
-AC_SUBST(LUIT_CFLAGS)
-AC_SUBST(LUIT_LIBS)
 
 AC_CONFIG_FILES([Makefile
                  man/Makefile])
