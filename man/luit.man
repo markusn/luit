@@ -17,7 +17,7 @@ luit \- Locale and ISO\ 2022 support for Unicode terminals
 ] [
 .B \-\-
 ] [
-.I program 
+.I program
 [
 .I args
 ] ]
@@ -115,7 +115,7 @@ The default depends on the locale, but is usually
 .TP
 .BI \-gr " gk"
 Set the initial assignment of GR.  The default depends on the locale,
-and is usually 
+and is usually
 .B g2
 except for EUC locales, where it is
 .BR g1 .
@@ -159,7 +159,7 @@ The most typical use of
 .B luit
 is to adapt an instance of
 .B XTerm
-to the locale's encoding.  Current versions of 
+to the locale's encoding.  Current versions of
 .B XTerm
 invoke
 .B luit
@@ -230,7 +230,7 @@ Charsets with a non-trivial intermediary byte are not yet supported.
 Selecting alternate sets of control characters is not supported and
 will never be.
 .SH SEE ALSO
-xterm(__mansuffix__), unicode(7), utf-8(7), charsets(7).
+xterm(__appmansuffix__), unicode(__miscmansuffix__), utf-8(__miscmansuffix__), charsets(__miscmansuffix__).
 .nf
 .br
 .I Character Code Structure and Extension Techniques (ISO\ 2022, ECMA-35).
@@ -243,4 +243,4 @@ The version of
 included in this X.Org Foundation release
 was originally written by Juliusz Chroboczek <jch@freedesktop.org>
 for the XFree86 Project and includes additional contributions from
-Thomas E. Dickey required for newer releases of xterm(__mansuffix__).
+Thomas E. Dickey required for newer releases of xterm(__appmansuffix__).
