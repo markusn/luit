@@ -32,7 +32,7 @@ m4_ifndef([XORG_MACROS_VERSION],
 XORG_MACROS_VERSION(1.8)
 XORG_DEFAULT_OPTIONS
 
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 AC_CANONICAL_HOST
 
@@ -43,7 +43,7 @@ AC_CHECK_FUNCS([select grantpt])
 AC_CHECK_LIB(z, gzopen,, AC_MSG_ERROR([zlib not found]))
 
 AC_ARG_WITH(localealiasfile,
-        AC_HELP_STRING([--with-localealiasfile=<path>],
+        AS_HELP_STRING([--with-localealiasfile=<path>],
                        [The locale alias file (default: ${datadir}/X11/locale/locale.alias)]),
         [LOCALEALIASFILE="$withval"],
         [LOCALEALIASFILE=${datadir}/X11/locale/locale.alias])

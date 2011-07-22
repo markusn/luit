@@ -33,4 +33,14 @@ extern int olog;
 void child(char *, char *, char *const *);
 void parent(int, int);
 
+void ErrorF(const char *f,...);
+
+/* Not using _X_NORETURN since that would pull in extra dependencies */
+#if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) >= 205)) \
+        || (defined(__SUNPRO_C) && (__SUNPRO_C >= 0x590))
+void FatalError(const char *f,...) __attribute((noreturn));
+#else
+void FatalError(const char *f,...);
+#endif
+
 #endif /* LUIT_LUIT_H */

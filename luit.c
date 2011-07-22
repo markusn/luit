@@ -71,7 +71,7 @@ static volatile int sigchld_queued = 0;
 static int convert(int, int);
 static int condom(int, char **);
 
-static void
+void
 ErrorF(const char *f,...)
 {
     va_list args;
@@ -80,7 +80,7 @@ ErrorF(const char *f,...)
     va_end(args);
 }
 
-static void
+void
 FatalError(const char *f,...)
 {
     va_list args;
